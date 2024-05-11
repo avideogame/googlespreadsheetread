@@ -1,0 +1,166 @@
+<!12may2024>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+<div id="id_title"></div>
+<div id="id_box">
+<div id="id_controlpanel">
+<textarea id="id_spreadsheetkeys"></textarea>
+<input type="button" id="id_button" value="Spreadsheets Get" />
+</div><!id_controlpanel>
+<div id="id_display">
+</div><!id_display>
+</div><!id_box>
+<script>
+var aobj = {
+	"set_init":function(param){
+		var athis = this;
+
+		if ("" != -0.1){
+			var google;
+
+			google = {};
+			google["visualization"] = {};
+			google["visualization"]["Query"] = {};
+			google["visualization"]["Query"]["setResponse"] = function(param2){
+				var i = Object.keys(athis.m_state["funcresponse"]).length;
+				var arecord2;
+				arecord2 = {};
+				arecord2["index"] = i;
+				arecord2["content"] = JSON.parse(JSON.stringify(param2));
+				athis.m_state["funcresponse"][""+i] = arecord2;
+
+				return i;
+			};
+			window["google"] = google;
+		}
+
+		return;
+	},
+	"set_start":function(param){
+		var athis = this;
+
+		athis.set_render(param);
+	},
+	"set_render":function(param){
+		var athis = this;
+		var aconfig = athis.get_config({});
+		var a;
+		var aelem;
+		var aid;
+		var s;
+		var aparent;
+		var afunc;
+		var afunc2;
+
+		s = aconfig["app"]["title"];
+		aid = "id_title";
+		jQuery("#"+aid).text(""+s);
+
+		s = "";
+		s += "<googlespreadsheetkey1>\n";
+		s += "<googlespreadsheetkey2>\n";
+		s += "<googlespreadsheetkey3>\n";
+		s += "...\n";
+		aid = "id_spreadsheetkeys";
+		jQuery("#"+aid).attr("placeholder",s);
+
+		afunc = function(param2){
+			var aindex = param2["index"];
+			var akey = param2["keys"][aindex];
+			var alink;
+			var apromise;
+
+			var aresult2;
+			var aelem2;
+			var aparent2;
+
+			if (akey){
+			}
+			else{
+				for(var i=0;i<param2["keys"].length;i++){
+					aresult2 = athis.m_state["funcresponse"][""+i];
+
+					aelem2 = jQuery("<div />",{});
+					jQuery(aelem2).appendTo(jQuery("#id_display"));
+					aparent2 = aelem2;
+
+					aelem2 = jQuery("<div />",{}).append(jQuery("<p />",{}));
+					jQuery(aelem2).appendTo(aparent2);
+
+					aelem2 = jQuery("<div />",{}).text(""+i+" "+param2["keys"][i]);
+					jQuery(aelem2).appendTo(aparent2);
+
+					aelem2 = jQuery("<div />",{}).text(JSON.stringify(aresult2));
+					jQuery(aelem2).appendTo(aparent2);
+				}
+
+				return;
+			}
+
+			alink = "https://docs.google.com/spreadsheets/d/"+akey+"/gviz/tq";
+
+			apromise = new Promise((aresolve) => {
+				var alink2 = alink;
+				var alength;
+
+				jQuery.ajax({
+					"url":""+alink2,
+					"method":"get",
+					"dataType":"jsonp",
+					"async":false,
+					"success":function(aresult,astatus,axhr){
+						aresolve(param2);
+					},
+					"error":function(astatus,axhr,aerror){
+						aresolve(param2);
+					},
+				});
+			});
+
+			apromise.then(afunc2).catch(function(aerror){
+			});
+		};
+
+		afunc2 = function(aresult){
+			var aparam2 = aresult;
+			var aindex2 = aparam2["index"];
+			if (aparam2["keys"].length > (aindex2)){
+				afunc({"keys":aparam2["keys"],"index":(aindex2+1),});
+				return null;
+			}
+
+			return null;
+		};
+
+		aid = "id_button";
+		jQuery("#"+aid).on("click",function(aevent){
+			var alines = jQuery("#id_spreadsheetkeys").val().trim().split(/\n/);
+			jQuery("#id_display").empty();
+			athis.m_state["funcresponse"] = {};
+			if (alines.length <= 0){
+				return;
+			}
+			afunc({"keys":alines,"index":0,});
+		});
+
+
+		return;
+	},
+	"m_state":{},
+	"get_config":function(param){
+		var athis = this;
+		var a;
+		a = {};
+		a["app"] = {};
+		a["app"]["title"] = "Google Spreadsheet Read";
+
+		return a;
+	},
+};
+</script>
+<script>
+jQuery(document).ready(function(){
+	aobj.set_init({});
+	aobj.set_start({});
+
+});
+</script>
